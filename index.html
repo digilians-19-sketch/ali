@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظام حضور المحاضرين</title>
+<title>نظام حضور المحاضرين | DIGILIANS</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -12,10 +12,39 @@
   --navy:#1F4E79; --blue:#2E75B6; --sky:#DEEAF1;
   --accent:#F0A500; --green:#28A745; --red:#DC3545;
   --bg:#F4F7FC; --text:#1a2a3a;
+  --card-bg: #ffffff;
+  --input-bg: #fafbff;
+  --input-border: #dde3ee;
   --shadow:0 8px 32px rgba(31,78,121,0.13);
 }
+
+/* ===== DARK MODE VARIABLES ===== */
+body.dark-mode {
+  --bg:#0F172A; --text:#F1F5F9; --sky:#1E293B;
+  --card-bg:#1E293B;
+  --input-bg: #151F32;
+  --input-border: #334155;
+  --shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* Smooth transitions for theme switching */
+body, .lec-card, .table-card, .instructions-card, .stat-card, select, input, .tabs, .tab, header {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===== DARK MODE FLOATING BUTTON ===== */
+.theme-toggle-btn {
+  position: fixed; left: 20px; top: 20px; z-index: 9999;
+  background: var(--card-bg); color: var(--text);
+  border: 2px solid var(--blue); border-radius: 50%;
+  width: 45px; height: 45px; font-size: 1.25rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+.theme-toggle-btn:hover { transform: scale(1.05); }
 
 /* ===== LECTURER VIEW ===== */
 #lecturer-view {
@@ -24,30 +53,39 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   padding:24px;
 }
+body.dark-mode #lecturer-view {
+  background: linear-gradient(135deg, #0F172A 0%, #152238 60%, #1E293B 100%);
+}
 .lec-card {
-  background:white; border-radius:24px; padding:40px 36px;
+  background:var(--card-bg); border-radius:24px; padding:40px 36px;
   box-shadow:0 20px 60px rgba(0,0,0,0.2); width:100%; max-width:460px;
 }
-.lec-logo { text-align:center; margin-bottom:24px; }
-.lec-logo .icon-big { font-size:3.5rem; }
-.lec-logo h1 { color:var(--navy); font-size:1.4rem; font-weight:900; margin-top:8px; }
+.lec-logo { text-align:center; margin-bottom:24px; display:flex; flex-direction:column; align-items:center; }
+.lec-logo h1 { color:var(--navy); font-size:1.4rem; font-weight:900; margin-top:12px; }
+body.dark-mode .lec-logo h1 { color: #FFFFFF; }
 .lec-logo p { color:#666; font-size:0.85rem; margin-top:4px; }
+body.dark-mode .lec-logo p { color:#cbd5e1; }
+
 .live-badge {
   display:inline-flex; align-items:center; gap:6px;
   background:var(--sky); color:var(--navy);
   border-radius:20px; padding:6px 14px; font-size:0.82rem; font-weight:700;
   margin-bottom:24px;
 }
+body.dark-mode .live-badge { color: #F1F5F9; }
 .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); animation:pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
 .form-group { margin-bottom:18px; }
 .form-group label { display:block; font-weight:700; margin-bottom:7px; color:var(--navy); font-size:0.92rem; }
+body.dark-mode .form-group label { color:#cbd5e1; }
 .form-group select, .form-group input {
-  width:100%; padding:13px 16px; border:2px solid #dde3ee; border-radius:12px;
+  width:100%; padding:13px 16px; border:2px solid var(--input-border); border-radius:12px;
   font-family:'Cairo',sans-serif; font-size:0.95rem; color:var(--text);
-  transition:border-color 0.2s; background:#fafbff;
+  background:var(--input-bg);
 }
 .form-group select:focus, .form-group input:focus { outline:none; border-color:var(--blue); }
+
 .action-btns { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; }
 .btn-attend {
   background:linear-gradient(135deg,#28A745,#20c997); color:white;
@@ -61,14 +99,18 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 }
 .btn-attend:hover,.btn-leave:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.18); }
 .btn-attend:disabled,.btn-leave:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
 .success-msg {
   display:none; background:linear-gradient(135deg,#e8f8ee,#d4f4e0);
   border:2px solid var(--green); border-radius:14px; padding:20px;
   text-align:center; margin-top:18px;
 }
+body.dark-mode .success-msg { background: linear-gradient(135deg, #064e3b, #022c22); }
 .success-msg .s-icon { font-size:2.5rem; }
 .success-msg h3 { color:var(--green); font-size:1.05rem; margin-top:6px; }
 .success-msg p { color:#444; font-size:0.85rem; margin-top:5px; }
+body.dark-mode .success-msg p { color: #e2e8f0; }
+
 .admin-link {
   text-align:center; margin-top:20px;
   font-size:0.78rem; color:rgba(255,255,255,0.5);
@@ -84,6 +126,7 @@ header {
   display:flex; align-items:center; justify-content:space-between;
   box-shadow:0 4px 20px rgba(31,78,121,0.3);
 }
+body.dark-mode header { background: linear-gradient(135deg, #0F172A, #1E293B); border-bottom: 1px solid #334155; }
 header h1 { font-size:1.3rem; font-weight:900; }
 .header-right { display:flex; align-items:center; gap:12px; }
 .live-time {
@@ -96,31 +139,39 @@ header h1 { font-size:1.3rem; font-weight:900; }
   font-size:0.85rem; font-weight:700; transition:all 0.2s;
 }
 .btn-logout:hover { background:rgba(255,255,255,0.35); }
+
 .tabs {
-  display:flex; background:white; border-bottom:3px solid var(--sky);
+  display:flex; background:var(--card-bg); border-bottom:3px solid var(--sky);
   padding:0 28px; gap:4px; overflow-x:auto;
 }
 .tab {
   padding:13px 22px; cursor:pointer; font-weight:700; font-size:0.9rem;
   color:#666; border-bottom:3px solid transparent; margin-bottom:-3px;
-  transition:all 0.2s; white-space:nowrap;
+  white-space:nowrap;
 }
+body.dark-mode .tab { color: #94a3b8; }
 .tab.active { color:var(--navy); border-bottom-color:var(--accent); }
+body.dark-mode .tab.active { color: var(--accent); }
+
 .content { display:none; padding:28px; max-width:1100px; margin:0 auto; }
 .content.active { display:block; }
 
-/* QR */
+/* QR Code Wrapper */
 .qr-wrapper { display:grid; grid-template-columns:auto 1fr; gap:32px; align-items:start; }
 .qr-card {
-  background:white; border-radius:20px; padding:28px;
+  background:var(--card-bg); border-radius:20px; padding:28px;
   box-shadow:var(--shadow); text-align:center; min-width:260px;
 }
 .qr-card h2 { color:var(--navy); font-size:1.1rem; margin-bottom:18px; }
+body.dark-mode .qr-card h2 { color: #f1f5f9; }
+
 #qr-container {
-  display:inline-flex; padding:14px; background:white;
+  display:inline-flex; padding:14px; background:white !important;
   border:4px solid var(--sky); border-radius:12px; margin-bottom:16px;
 }
 .qr-note { background:var(--sky); border-radius:8px; padding:10px 12px; font-size:0.78rem; color:var(--navy); margin-bottom:14px; word-break:break-all; }
+body.dark-mode .qr-note { color: #f8fafc; }
+
 .btn { display:inline-block; padding:9px 20px; border-radius:10px; font-family:'Cairo',sans-serif; font-weight:700; font-size:0.88rem; cursor:pointer; border:none; transition:all 0.2s; }
 .btn-primary { background:var(--navy); color:white; }
 .btn-primary:hover { background:var(--blue); }
@@ -128,34 +179,48 @@ header h1 { font-size:1.3rem; font-weight:900; }
 .btn-green { background:var(--green); color:white; }
 .btn-red { background:var(--red); color:white; }
 .btn-outline { background:transparent; color:var(--navy); border:2px solid var(--navy); }
-.instructions-card { background:white; border-radius:20px; padding:28px; box-shadow:var(--shadow); }
+body.dark-mode .btn-outline { color: #f8fafc; border-color: #475569; }
+
+.instructions-card { background:var(--card-bg); border-radius:20px; padding:28px; box-shadow:var(--shadow); }
 .instructions-card h3 { color:var(--navy); margin-bottom:18px; }
+body.dark-mode .instructions-card h3 { color: #f1f5f9; }
 .step { display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; padding:12px; background:var(--sky); border-radius:10px; }
 .step-num { background:var(--navy); color:white; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0; }
 .step p { font-size:0.9rem; line-height:1.6; }
 
 /* Stats */
 .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:18px; margin-bottom:28px; }
-.stat-card { background:white; border-radius:16px; padding:22px; box-shadow:var(--shadow); text-align:center; border-top:4px solid var(--blue); }
+.stat-card { background:var(--card-bg); border-radius:16px; padding:22px; box-shadow:var(--shadow); text-align:center; border-top:4px solid var(--blue); }
 .stat-card .num { font-size:2rem; font-weight:900; color:var(--navy); }
+body.dark-mode .stat-card .num { color: #FFFFFF; }
 .stat-card .lbl { font-size:0.82rem; color:#666; margin-top:4px; }
+body.dark-mode .stat-card .lbl { color: #94a3b8; }
 
 /* Table */
-.table-card { background:white; border-radius:20px; padding:26px; box-shadow:var(--shadow); }
+.table-card { background:var(--card-bg); border-radius:20px; padding:26px; box-shadow:var(--shadow); }
 .table-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
 .table-header h2 { color:var(--navy); font-size:1.1rem; }
+body.dark-mode .table-header h2 { color: #f1f5f9; }
 .tbl-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .records-count { background:var(--sky); color:var(--navy); padding:5px 12px; border-radius:20px; font-weight:700; font-size:0.82rem; }
+body.dark-mode .records-count { color: #ffffff; }
+
 .filter-row { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
 .filter-row select, .filter-row input {
-  padding:8px 12px; border:2px solid #dde3ee; border-radius:8px;
-  font-family:'Cairo',sans-serif; font-size:0.85rem; color:var(--text);
+  padding:8px 12px; border:2px solid var(--input-border); border-radius:8px;
+  font-family:'Cairo',sans-serif; font-size:0.85rem; color:var(--text); background: var(--input-bg);
 }
+
 table { width:100%; border-collapse:collapse; }
 thead th { background:var(--navy); color:white; padding:11px 14px; text-align:center; font-size:0.88rem; font-weight:700; }
+body.dark-mode thead th { background: #334155; }
 tbody tr:nth-child(even) { background:var(--sky); }
+body.dark-mode tbody tr:nth-child(even) { background: #151F32; }
 tbody tr:hover { background:#d0e4f5; }
+body.dark-mode tbody tr:hover { background: #334155; }
 tbody td { padding:10px 14px; text-align:center; font-size:0.88rem; border-bottom:1px solid #e8eef5; }
+body.dark-mode tbody td { border-bottom-color: #334155; }
+
 .badge { display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.78rem; font-weight:700; }
 .badge-attend { background:#d4edda; color:#155724; }
 .badge-leave  { background:#f8d7da; color:#721c24; }
@@ -170,19 +235,21 @@ tbody td { padding:10px 14px; text-align:center; font-size:0.88rem; border-botto
   background:linear-gradient(135deg,#1F4E79,#2E75B6);
   display:flex; align-items:center; justify-content:center; padding:24px;
 }
+body.dark-mode #login-overlay { background: linear-gradient(135deg, #0F172A, #152238); }
 .login-box {
-  background:white; border-radius:24px; padding:40px 36px;
+  background:var(--card-bg); border-radius:24px; padding:40px 36px;
   box-shadow:0 20px 60px rgba(0,0,0,0.3); width:100%; max-width:380px; text-align:center;
 }
 .login-box .lock-icon { font-size:3rem; margin-bottom:12px; }
 .login-box h2 { color:var(--navy); font-size:1.3rem; font-weight:900; margin-bottom:6px; }
+body.dark-mode .login-box h2 { color:#ffffff; }
 .login-box p { color:#666; font-size:0.85rem; margin-bottom:24px; }
+body.dark-mode .login-box p { color:#94a3b8; }
 .login-box input {
-  width:100%; padding:14px 16px; border:2px solid #dde3ee; border-radius:12px;
+  width:100%; padding:14px 16px; border:2px solid var(--input-border); border-radius:12px;
   font-family:'Cairo',sans-serif; font-size:1rem; text-align:center;
-  letter-spacing:4px; margin-bottom:14px;
+  letter-spacing:4px; margin-bottom:14px; background:var(--input-bg); color:var(--text);
 }
-.login-box input:focus { outline:none; border-color:var(--blue); }
 .btn-login {
   width:100%; padding:14px; background:linear-gradient(135deg,var(--navy),var(--blue));
   color:white; border:none; border-radius:12px; font-family:'Cairo',sans-serif;
@@ -191,10 +258,11 @@ tbody td { padding:10px 14px; text-align:center; font-size:0.88rem; border-botto
 .btn-login:hover { opacity:0.9; transform:translateY(-1px); }
 .login-error { color:var(--red); font-size:0.85rem; margin-top:10px; display:none; }
 .btn-back-lec {
-  margin-top:14px; background:none; border:2px solid #dde3ee; color:#666;
+  margin-top:14px; background:none; border:2px solid var(--input-border); color:#666;
   border-radius:10px; padding:9px 18px; font-family:'Cairo',sans-serif;
   font-size:0.85rem; cursor:pointer; font-weight:700; width:100%;
 }
+body.dark-mode .btn-back-lec { color:#94a3b8; }
 
 @media(max-width:768px){
   .qr-wrapper{grid-template-columns:1fr;}
@@ -204,19 +272,33 @@ tbody td { padding:10px 14px; text-align:center; font-size:0.88rem; border-botto
   .lec-card{padding:28px 20px;}
 }
 @media print{
-  #admin-view header,.tabs,.instructions-card{display:none!important;}
+  #admin-view header,.tabs,.instructions-card, .theme-toggle-btn{display:none!important;}
   .qr-card{box-shadow:none;border:2px solid #ccc;}
 }
 </style>
 </head>
 <body>
 
+<button class="theme-toggle-btn" id="dark-mode-toggle" onclick="toggleDarkMode()" title="تغيير المظهر">🌙</button>
+
 <div id="lecturer-view">
   <div class="lec-card">
     <div class="lec-logo">
-      <div class="icon-big">🏛️</div>
+      <svg width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0px 6px 12px rgba(46,117,182,0.35));">
+        <path d="M22 20H55C71.5685 20 85 33.4315 85 50C85 66.5685 71.5685 80 55 80H22V20Z" fill="url(#digiGrad)" />
+        <path d="M40 36H55C62.732 36 69 42.268 69 50C69 57.732 62.732 64 55 64H40V36Z" fill="#FFFFFF"/>
+        <circle cx="55" cy="50" r="7" fill="#F0A500" />
+        <circle cx="22" cy="20" r="4.5" fill="#2E75B6" />
+        <circle cx="22" cy="80" r="4.5" fill="#2E75B6" />
+        <defs>
+          <linearGradient id="digiGrad" x1="22" y1="20" x2="85" y2="80" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#1F4E79"/>
+            <stop offset="1" stop-color="#2E75B6"/>
+          </linearGradient>
+        </defs>
+      </svg>
       <h1>تسجيل الحضور والانصراف</h1>
-      <p>سجّل حضورك أو انصرافك بسهولة</p>
+      <p style="font-weight: 800; color: var(--blue); letter-spacing: 0.5px; margin-top: 6px;">DIGILIANS TRACK</p>
     </div>
     <div style="text-align:center; margin-bottom:20px;">
       <span class="live-badge">
@@ -261,8 +343,13 @@ tbody td { padding:10px 14px; text-align:center; font-size:0.88rem; border-botto
 
 <div id="admin-view">
   <header>
-    <div>
-      <h1>🏛️ لوحة إدارة الحضور — AI Track</h1>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22 20H55C71.5685 20 85 33.4315 85 50C85 66.5685 71.5685 80 55 80H22V20Z" fill="#FFFFFF" />
+        <path d="M40 36H55C62.732 36 69 42.268 69 50C69 57.732 62.732 64 55 64H40V36Z" fill="#1F4E79"/>
+        <circle cx="55" cy="50" r="7" fill="#F0A500" />
+      </svg>
+      <h1>لوحة إدارة الحضور — DIGILIANS</h1>
     </div>
     <div class="header-right">
       <div class="live-time" id="admin-live-time"></div>
@@ -296,7 +383,7 @@ tbody td { padding:10px 14px; text-align:center; font-size:0.88rem; border-botto
         <div class="step"><div class="step-num">4</div><p>تُسجَّل البيانات فوراً وتظهر في "السجلات"</p></div>
         <div class="step"><div class="step-num">5</div><p>تصدّر كل السجلات Excel بضغطة واحدة</p></div>
         <div style="background:#FEF3C7;border:2px solid var(--accent);border-radius:10px;padding:14px;margin-top:16px;font-size:0.88rem;">
-          <strong style="color:var(--accent);">🔒 الأمان:</strong> المحاضرون يشوفون فقط نموذج التسجيل. السجلات والإحصائيات محمية بكلمة المرور.
+          <strong style="color:#b45309;">🔒 الأمان:</strong> المحاضرون يشوفون فقط نموذج التسجيل. السجلات والإحصائيات محمية بكلمة المرور.
         </div>
       </div>
     </div>
@@ -356,7 +443,7 @@ tbody td { padding:10px 14px; text-align:center; font-size:0.88rem; border-botto
       </div>
       
       <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; align-items:center;">
-        <input type="text" id="new-lec-name" placeholder="➕ اكتب اسم المحاضر الجديد الكامل هنا..." style="padding:12px; border:2px solid #dde3ee; border-radius:10px; font-family:'Cairo'; flex:1; min-width:260px;">
+        <input type="text" id="new-lec-name" placeholder="➕ اكتب اسم المحاضر الجديد الكامل هنا..." style="padding:12px; border:2px solid var(--input-border); border-radius:10px; font-family:'Cairo'; flex:1; min-width:260px;">
         <button class="btn btn-green" onclick="addLecturer()" style="padding:12px 24px;">➕ إضافة لقائمة الأسماء</button>
       </div>
       
@@ -389,6 +476,18 @@ const defaultLecturers = [
 // جلب قائمة المحاضرين من المتصفح أو اعتماد الافتراضية لأول مرة
 let lecturers = JSON.parse(localStorage.getItem('att_lecturers') || JSON.stringify(defaultLecturers));
 function saveLecturers() { localStorage.setItem('att_lecturers', JSON.stringify(lecturers)); }
+
+// ===== DARK MODE LOGIC =====
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('digi_dark_mode', isDark ? 'enabled' : 'disabled');
+  document.getElementById('dark-mode-toggle').textContent = isDark ? '☀️' : '🌙';
+}
+// Apply saved theme preference on load
+if(localStorage.getItem('digi_dark_mode') === 'enabled') {
+  document.body.classList.add('dark-mode');
+  document.getElementById('dark-mode-toggle').textContent = '☀️';
+}
 
 // ===== TIME =====
 function updateTimes() {
@@ -520,7 +619,7 @@ function renderTable() {
   const rows = [...filtered].reverse().map((r,i) =>
     `<tr>
       <td>${filtered.length - i}</td>
-      <td style="text-align:right;max-width:220px;">${r.name}</td>
+      <td style="text-align:right;max-width:220px;font-weight:600;">${r.name}</td>
       <td>${r.date}</td>
       <td>${r.time}</td>
       <td><span class="badge ${r.type==='حضور'?'badge-attend':'badge-leave'}">${r.type}</span></td>
@@ -561,7 +660,7 @@ function renderStats() {
     else byLec[r.name].leave++;
   });
   const rows = Object.entries(byLec).map(([name,d]) =>
-    `<tr><td style="text-align:right">${name}</td>
+    `<tr><td style="text-align:right;font-weight:600;">${name}</td>
      <td><span class="badge badge-attend">${d.attend}</span></td>
      <td><span class="badge badge-leave">${d.leave}</span></td></tr>`
   ).join('');
@@ -594,7 +693,7 @@ function exportToExcel() {
   const ws2 = XLSX.utils.aoa_to_sheet(sum);
   ws2['!cols'] = [{wch:38},{wch:14},{wch:16}];
   XLSX.utils.book_append_sheet(wb, ws2, 'الملخص');
-  XLSX.writeFile(wb, 'حضور_AI_Track_' + new Date().toISOString().split('T')[0] + '.xlsx');
+  XLSX.writeFile(wb, 'حضور_DIGILIANS_' + new Date().toISOString().split('T')[0] + '.xlsx');
 }
 
 // ===== MANAGEMENT OF LECTURERS (ADMIN CONTROL) =====
@@ -666,7 +765,6 @@ function editLecturer(index) {
   if (!trimmed) { alert('خطأ: الاسم لا يمكن أن يكون فارغاً!'); return; }
   if (trimmed !== oldName && lecturers.includes(trimmed)) { alert('خطأ: هذا الاسم موجود بالفعل لمحاضر آخر!'); return; }
   
-  // تحديث الاسم في السجلات القديمة تلقائياً حتى لا تضيع إحصائياته السابقة
   records.forEach(r => {
     if (r.name === oldName) r.name = trimmed;
   });
